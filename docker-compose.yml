@@ -122,7 +122,7 @@ services:
     image: docker.elastic.co/beats/filebeat:${TAG}
     container_name: setup_filebeat
     volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro']
-    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s filebeat -system.hostfs=/hostfs -strict.perms=false']
+    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s filebeat -system.hostfs=/hostfs && filebeat -e -strict.perms=false']
     networks: ['stack']
     depends_on: ['kibana']
 
