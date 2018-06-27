@@ -1,0 +1,6 @@
+metricbeat.modules:
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(mysql:3306)/"] 
+  username: ${MYSQL_USER}
+  password: ${MYSQL_PASSWORD}
