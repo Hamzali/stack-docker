@@ -52,6 +52,7 @@ services:
   filebeat:
     image: docker.elastic.co/beats/filebeat:${TAG}
     container_name: filebeat
+    volumes: ['./config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro']
     # If the host system has logs at "/var/log", mount them at "/mnt/log"
     # inside the container, where Filebeat can find them.
     # volumes: ['/var/log:/mnt/log:ro']
@@ -76,6 +77,10 @@ services:
     #   - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
     #   - /:/hostfs:ro
     networks: ['stack']
+    network_mode: host
+    volumes: ["/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./config/metricbeat/modules.d:/usr/share/metricbeat/modules.d"]
+    environment: ['MYSQL_PASSWORD=12345', 'MYSQL_USER=prowmes']
+    command: ["-system.hostfs=/hostfs"]
     depends_on: ['elasticsearch', 'setup_metricbeat']
 
   packetbeat:
@@ -116,7 +121,7 @@ services:
   setup_filebeat:
     image: docker.elastic.co/beats/filebeat:${TAG}
     container_name: setup_filebeat
-    volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro', './config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro']
+    volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro']
     command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s filebeat']
     networks: ['stack']
     depends_on: ['kibana']
@@ -134,10 +139,8 @@ services:
     container_name: setup_metricbeat
     volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro', "/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./config/metricbeat/modules.d:/usr/share/metricbeat/modules.d"]
     command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s metricbeat']
-    networks: ['stack', 'host']
+    networks: ['stack']
     depends_on: ['kibana']
-    command: ['-system.hostfs=/hostfs']
-    environment: ['MYSQL_PASSWORD=12345', 'MYSQL_USER=prowmes']
 
   setup_packetbeat:
     image: docker.elastic.co/beats/packetbeat:${TAG}
