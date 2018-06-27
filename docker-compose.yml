@@ -97,7 +97,6 @@ services:
       - /proc:/hostfs/proc:ro
       - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
       - /:/hostfs:ro
-      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
       #Allows us to report on docker from the hosts information.
       - /var/run/docker.sock:/var/run/docker.sock
     environment: ['MYSQL_PASSWORD=12345', 'MYSQL_USER=prowmes']
