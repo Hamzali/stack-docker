@@ -65,7 +65,7 @@ services:
       #Mount the hosts system log directory. This represents the logs of the VM hosting docker. Consumed by the Filebeat system module.
       - /private/var/log/:/var/log/host/:ro
       #Mount the Docker logs for indexing by the custom prospector ./config/filebeat/prospectors.d.
-      - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
+      # - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
       #Named volume fsdata. This is used to persist the registry file between restarts, so to avoid data duplication.
       # - filebeatdata:/usr/share/filebeat/data/
       #Allows us to report on docker from the hosts information.
