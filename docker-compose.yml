@@ -78,7 +78,7 @@ services:
     #   - /:/hostfs:ro
     # networks: ['stack']
     network_mode: host
-    volumes: ["/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./config/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"]
+    volumes: ["/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro"]
     environment: ['MYSQL_PASSWORD=12345', 'MYSQL_USER=prowmes']
     # command: ["-system.hostfs=/hostfs", '-strict.perms=false']
     depends_on: ['elasticsearch', 'setup_metricbeat']
