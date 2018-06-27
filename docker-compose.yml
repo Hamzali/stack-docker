@@ -78,7 +78,7 @@ services:
     #   - /:/hostfs:ro
     # networks: ['stack']
     network_mode: host
-    volumes: ["/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./config/metricbeat/modules.d:/usr/share/metricbeat/modules.d:ro"]
+    volumes: ["/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./config/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"]
     environment: ['MYSQL_PASSWORD=12345', 'MYSQL_USER=prowmes']
     # command: ["-system.hostfs=/hostfs", '-strict.perms=false']
     depends_on: ['elasticsearch', 'setup_metricbeat']
@@ -138,7 +138,7 @@ services:
     image: docker.elastic.co/beats/metricbeat:${TAG}
     container_name: setup_metricbeat
     volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro', "/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro"]
-    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s metricbeat -system.hostfs=/hostfs && metricbeat -e -strict.perms=false']
+    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s metricbeat -system.hostfs=/hostfs']
     networks: ['stack']
     depends_on: ['kibana']
 
