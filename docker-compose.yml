@@ -122,7 +122,7 @@ services:
     image: docker.elastic.co/beats/filebeat:${TAG}
     container_name: setup_filebeat
     volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro']
-    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s filebeat -system.hostfs=/hostfs && filebeat -e -strict.perms=false']
+    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s filebeat']
     networks: ['stack']
     depends_on: ['kibana']
 
@@ -137,8 +137,8 @@ services:
   setup_metricbeat:
     image: docker.elastic.co/beats/metricbeat:${TAG}
     container_name: setup_metricbeat
-    volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro', "/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./config/metricbeat/modules.d:/usr/share/metricbeat/modules.d"]
-    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s metricbeat']
+    volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro', "/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro"]
+    command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s metricbeat -system.hostfs=/hostfs && metricbeat -e -strict.perms=false']
     networks: ['stack']
     depends_on: ['kibana']
 

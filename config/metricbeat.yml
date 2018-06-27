@@ -1,0 +1,45 @@
+metricbeat.modules:
+- module: docker
+  metricsets:
+    - container
+    - cpu 
+    - diskio
+    - healthcheck
+    - info
+    - memory
+    - network
+  hosts: ["unix:///var/run/docker.sock"]
+  enabled: true
+  period: 10s
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(mysql:3306)/"] 
+  username: ${MYSQL_USER}
+  password: ${MYSQL_PASSWORD}
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
+
+  # Nginx hosts
+  hosts: ["http://127.0.0.1"]
+
+  # Path to server status. Default server-status
+  server_status_path: "server-status"
+- module: redis
+  metricsets: ["info", "keyspace"]
+  enabled: true
+  period: 10s
+
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
+
+output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
+  # Array of hosts to connect to.
+  # Scheme and port can be left out and will be set to the default (http and 9200)
+  # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
+  hosts: ["localhost:9200"]
