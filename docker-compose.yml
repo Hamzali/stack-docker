@@ -132,7 +132,7 @@ services:
   setup_metricbeat:
     image: docker.elastic.co/beats/metricbeat:${TAG}
     container_name: setup_metricbeat
-    volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro', "/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./configs/metricbeat/modules.d:/usr/share/metricbeat/modules.d"]
+    volumes: ['./scripts/setup-beat.sh:/usr/local/bin/setup-beat.sh:ro', "/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro", "./config/metricbeat/modules.d:/usr/share/metricbeat/modules.d"]
     command: ['/bin/bash', '-c', 'cat /usr/local/bin/setup-beat.sh | tr -d "\r" | bash -s metricbeat']
     networks: ['stack', 'host']
     depends_on: ['kibana']
