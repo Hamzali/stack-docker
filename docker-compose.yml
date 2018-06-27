@@ -51,11 +51,24 @@ services:
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:${TAG}
+    user: root #To read the docker socket
     container_name: filebeat
-    volumes: ['./config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro']
+    # volumes: ['./config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro']
     # If the host system has logs at "/var/log", mount them at "/mnt/log"
     # inside the container, where Filebeat can find them.
-    # volumes: ['/var/log:/mnt/log:ro']
+    volumes: 
+      - /var/log:/mnt/log:ro
+      # - ./config/beats/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      #Mount the prospectors directory. Users can in turn add propspectors to this directory and they will be dynamically loaded.
+      # - ./config/beats/filebeat/prospectors.d/:/usr/share/filebeat/prospectors.d/
+      #Mount the hosts system log directory. This represents the logs of the VM hosting docker. Consumed by the Filebeat system module.
+      - /private/var/log/:/var/log/host/:ro
+      #Mount the Docker logs for indexing by the custom prospector ./config/filebeat/prospectors.d.
+      - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
+      #Named volume fsdata. This is used to persist the registry file between restarts, so to avoid data duplication.
+      # - filebeatdata:/usr/share/filebeat/data/
+      #Allows us to report on docker from the hosts information.
+      - /var/run/docker.sock:/var/run/docker.sock
     networks: ['stack']
     depends_on: ['elasticsearch', 'setup_filebeat']
 
@@ -68,6 +81,8 @@ services:
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:${TAG}
     container_name: metricbeat
+    user: root #To read the docker socket
+
     # The commented sections below enable Metricbeat to monitor the Docker host,
     # rather than the Metricbeat container. It's problematic with Docker for
     # Windows, however, since "/proc", "/sys" etc. don't exist on Windows.
@@ -78,9 +93,15 @@ services:
     #   - /:/hostfs:ro
     # networks: ['stack']
     network_mode: host
-    volumes: ["/proc:/hostfs/proc:ro", "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro", "/:/hostfs:ro"]
+    volumes: 
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      #Allows us to report on docker from the hosts information.
+      - /var/run/docker.sock:/var/run/docker.sock
     environment: ['MYSQL_PASSWORD=12345', 'MYSQL_USER=prowmes']
-    command: -e -E 'output.elasticsearch.hosts=["localhost:9200"]'
+    command: -e -system.hostfs=/hostfs -E 'output.elasticsearch.hosts=["localhost:9200"]'
     depends_on: ['elasticsearch', 'setup_metricbeat']
 
   packetbeat:
