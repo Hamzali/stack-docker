@@ -53,11 +53,12 @@ services:
     image: docker.elastic.co/beats/filebeat:${TAG}
     user: root #To read the docker socket
     container_name: filebeat
+    network_mode: host
     # volumes: ['./config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro']
     # If the host system has logs at "/var/log", mount them at "/mnt/log"
     # inside the container, where Filebeat can find them.
     volumes: 
-      - /var/log:/mnt/log:ro
+      - /var/log:/var/log:ro
       # - ./config/beats/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       #Mount the prospectors directory. Users can in turn add propspectors to this directory and they will be dynamically loaded.
       # - ./config/beats/filebeat/prospectors.d/:/usr/share/filebeat/prospectors.d/
@@ -69,7 +70,8 @@ services:
       # - filebeatdata:/usr/share/filebeat/data/
       #Allows us to report on docker from the hosts information.
       - /var/run/docker.sock:/var/run/docker.sock
-    networks: ['stack']
+    # networks: ['stack']
+    command: -e -E 'output.elasticsearch.hosts=["localhost:9200"]'
     depends_on: ['elasticsearch', 'setup_filebeat']
 
   heartbeat:
